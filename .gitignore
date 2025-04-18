@@ -1,0 +1,56 @@
+# =========================
+# OS / Editor Generated
+# =========================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+*.swp
+*.swo
+*.swn
+
+# =========================
+# Node.js / npm / pnpm
+# =========================
+node_modules/
+dist/
+build/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+npm-debug.log*
+*.log
+
+# =========================
+# SvelteKit / Vite
+# =========================
+.svelte-kit/
+.vite/
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# =========================
+# 環境変数
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Rust / Tauri
+# =========================
+/src-tauri/target/
+/src-tauri/.cargo/
+/src-tauri/Cargo.lock
+
+# =========================
+# その他ビルド/出力物
+# =========================
+*.tmp
+*.bak
+*.lock
+
+# =========================
+# IDE設定（任意）
+# =========================
+.vscode/
+.idea/
