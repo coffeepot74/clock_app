@@ -1,156 +1,131 @@
 <script>
-  import { invoke } from "@tauri-apps/api/core";
+  import { onMount } from "svelte";
+  let time = "";
+  let period = "";
+  let minutesLeft = "";
 
-  let name = $state("");
-  let greetMsg = $state("");
+  const updateTime = () => {
+    const now = new Date();
+    time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    const totalMinutes = hour * 60 + minute;
+    let endMinutes = null;
 
-  async function greet(event) {
-    event.preventDefault();
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsg = await invoke("greet", { name });
-  }
+    if (totalMinutes >= 915 || hour < 3) {
+      period = "放課後";
+      minutesLeft = "";
+      return;
+    }
+
+    if (totalMinutes >= 535 && totalMinutes < 585) { // 8:55 - 9:45
+      period = "1限";
+      endMinutes = 585
+    } else if (totalMinutes >= 585 && totalMinutes < 595) { // 9:45 - 9:55
+      period = "休憩";
+      endMinutes = 595; // 9:55
+    } else if (totalMinutes >= 595 && totalMinutes < 645) { // 9:55 - 10:45
+      period = "2限";
+      endMinutes = 645;
+    } else if (totalMinutes >= 645 && totalMinutes < 655) { // 10:45 - 10:55
+      period = "休憩";
+      endMinutes = 655;
+    } else if (totalMinutes >= 655 && totalMinutes < 705) { // 10:55 - 11:45
+      period = "3限";
+      endMinutes = 705;
+    } else if (totalMinutes >= 705 && totalMinutes < 715) { // 11:45 - 11:55
+      period = "休憩";
+      endMinutes = 715;
+    } else if (totalMinutes >= 715 && totalMinutes < 765) { // 11:55 - 12:45
+      period = "4限";
+      endMinutes = 765;
+    } else if (totalMinutes >= 765 && totalMinutes < 805) { // 12:45 - 13:25
+      period = "昼休み";
+      endMinutes = 805;
+    } else if (totalMinutes >= 805 && totalMinutes < 855) { // 13:25 - 14:15
+      period = "5限";
+      endMinutes = 855;
+    } else if (totalMinutes >= 855 && totalMinutes < 865) { // 14:15 - 14:25
+      period = "休憩";
+      endMinutes = 865;
+    } else if (totalMinutes >= 865 && totalMinutes < 915) { // 14:25 - 15:15
+      period = "6限";
+      endMinutes = 915;
+    }
+    if (endMinutes !== null) {
+      minutesLeft = endMinutes - totalMinutes;
+      if (minutesLeft < 0) {
+        minutesLeft = 0; // マイナスにならないように
+      }
+    } else {
+      minutesLeft = "";
+    }
+  };
+
+
+
+  onMount(() => {
+    updateTime();
+    setInterval(updateTime, 1000);
+  });
 </script>
 
-<main class="container">
-  <h1>Welcome to Tauri + Svelte</h1>
-
-  <div class="row">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://kit.svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte-kit" alt="SvelteKit Logo" />
-    </a>
+<main
+  style="
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    font-size: 1em;
+    text-align: center;
+    user-select: none;
+    margin: 0;
+    padding: 0;
+    transform: translateY(-3px);
+  "
+>
+  <div>
+    {time}
+    {#if period}
+      / {period}
+      {#if period !== "放課後"}
+        / あと{minutesLeft}分
+      {/if}
+    {/if
+    }
   </div>
-  <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
-
-  <form class="row" onsubmit={greet}>
-    <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
-    <button type="submit">Greet</button>
-  </form>
-  <p>{greetMsg}</p>
+  <button aria-label="設定"
+    style="
+    position: absolute;
+    top: -0.40em;
+    right: 0.1em;
+    font-size: 1em;
+    padding: 0.2em 0.4em;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    "
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="40"
+      height="40"
+      viewBox="0 0 40 40"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M10.325 4.317c.426-1.756 3.084-1.756 3.51 0a1.724 1.724 0 0 0 2.591 1.1c1.518-.888 3.286.88 2.4 2.397a1.724 1.724 0 0 0 1.098 2.592c1.756.426 1.756 3.084 0 3.51a1.724 1.724 0 0 0-1.098 2.591c.887 1.518-.882 3.286-2.4 2.4a1.724 1.724 0 0 0-2.591 1.098c-.426 1.756-3.084 1.756-3.51 0a1.724 1.724 0 0 0-2.592-1.098c-1.518.886-3.286-.882-2.4-2.4a1.724 1.724 0 0 0-1.098-2.591c-1.756-.426-1.756-3.084 0-3.51a1.724 1.724 0 0 0 1.098-2.592c-.886-1.518.882-3.285 2.4-2.397a1.724 1.724 0 0 0 2.592-1.1z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  </button>
 </main>
-
-<style>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.svelte-kit:hover {
-  filter: drop-shadow(0 0 2em #ff3e00);
-}
-
-:root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-  color: #0f0f0f;
-  background-color: #f6f6f6;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-.container {
-  margin: 0;
-  padding-top: 10vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
-.row {
-  display: flex;
-  justify-content: center;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
-  }
-}
-
-</style>
